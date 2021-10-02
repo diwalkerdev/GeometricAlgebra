@@ -38,10 +38,27 @@ Test_VectorAddition()
 }
 
 
+void
+Test_VectorSubtraction()
+{
+    printf(__func__);
+    printf("\n");
+
+    Vec v1 { 1.f, 2.f, 3.f };
+    Vec v2 { 1.f, 1.f, 1.f };
+
+    auto v3 = v1 - v2;
+    assert(v3.x == 0.f);
+    assert(v3.y == 1.f);
+    assert(v3.z == 2.f);
+}
+
+
 int
 main(void)
 {
     Test_SetGetElements();
     Test_VectorAddition();
+    Test_VectorSubtraction();
     printf("%s PASSED\n", "test_basic_operators.cpp");
 }

@@ -34,11 +34,23 @@ struct Vec
             this->z + other.z
         };
     }
+
+
+    Vec
+    operator-(Vec const& other)
+    {
+        return {
+            this->x - other.x,
+            this->y - other.y,
+            this->z - other.z
+        };
+    }
 };
 
 
 // Utility function for printing a Vec.
-// The format is "a<x> b<y> c<z>" where a,b and c are floating point numbers.
+// The format is "a<x> b<y> c<z>" where a,b and c are floating point numbers
+// formatted to 3dp.
 void
 Vec_Print(Vec const& v1);
 
