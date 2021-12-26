@@ -122,6 +122,11 @@ struct Rotor
     float    s;
     BiVector B;
 
+    Rotor()
+    {
+        this->s = 1.0f;
+        this->B = { 0.0f, 0.0f, 0.0f };
+    }
     Rotor(float s, BiVector B)
     {
         this->s = s;
@@ -131,6 +136,13 @@ struct Rotor
     {
         this->s = std::get<0>(s_B);
         this->B = std::get<1>(s_B);
+    }
+    Rotor(float s, float e12, float e13, float e23)
+    {
+        this->s     = s;
+        this->B.e12 = e12;
+        this->B.e13 = e13;
+        this->B.e23 = e23;
     }
 };
 
@@ -316,19 +328,62 @@ Vec_Mul(std::tuple<TriVector, Vec> const& M, Rotor const& R)
 inline Rotor
 Geo_Mul(Rotor const& X, Rotor const& Y)
 {
-    auto const& a  = X.s;
-    auto const& B1 = X.B;
+    // I get different signage to marctenbosch because I think our q and ps
+    // are swapped. I believe the following is correct for how the variables
+    // are passed into this equation.
+    Rotor R;
+    {
+        auto const& p_a = X.s;
+        auto const& q_a = Y.s;
 
-    auto const& b  = Y.s;
-    auto const& B2 = Y.B;
+        float p_b01 = X.B.e12;
+        float p_b02 = X.B.e13;
+        float p_b12 = X.B.e23;
 
-    Rotor R = {
-        a * b + B1.e12 * B2.e12 + B1.e13 * B2.e13 + B1.e23 * B2.e23, // scalar
-        { a * B2.e12 + b * B1.e12 + B1.e13 * B2.e23 - B1.e23 * B2.e13, // e12
-          a * B2.e13 + B1.e12 * B2.e23 + b * B1.e13 - B1.e23 * B2.e12, // e13
-          a * B2.e23 - B1.e12 * B2.e23 + B1.e13 * B2.e12 + b * B1.e23 } // e23
-    };
-    Geo_Normalise(R);
+        float q_b01 = Y.B.e12;
+        float q_b02 = Y.B.e13;
+        float q_b12 = Y.B.e23;
+
+        R = Rotor {
+            p_a * q_a - p_b01 * q_b01 - p_b02 * q_b02 - p_b12 * q_b12, // scalar
+            { p_a * q_b01 + q_a * p_b01 + p_b02 * q_b12 - p_b12 * q_b02, // e12
+              p_a * q_b02 + p_b01 * q_b12 + q_a * p_b02 - p_b12 * q_b01, // e13
+              p_a * q_b12 - p_b01 * q_b02 + p_b02 * q_b01 + q_a * p_b12 } // e23
+        };
+        Geo_Normalise(R);
+    }
+
+    // Rotor R2;
+    // {
+    //     float p_a   = X.s;
+    //     float p_b01 = X.B.e12;
+    //     float p_b02 = X.B.e13;
+    //     float p_b12 = X.B.e23;
+
+    //     float q_a   = Y.s;
+    //     float q_b01 = Y.B.e12;
+    //     float q_b02 = Y.B.e13;
+    //     float q_b12 = Y.B.e23;
+
+    //     float r_a = p_a * q_a
+    //         - p_b01 * q_b01 - p_b02 * q_b02 - p_b12 * q_b12;
+
+    //     float r_b01 = p_b01 * q_a + p_a * q_b01
+    //         + p_b12 * q_b02 - p_b02 * q_b12;
+
+    //     float r_b02 = p_b02 * q_a + p_a * q_b02
+    //         - p_b12 * q_b01 + p_b01 * q_b12;
+
+    //     float r_b12 = p_b12 * q_a + p_a * q_b12
+    //         + p_b02 * q_b01 - p_b01 * q_b02;
+
+    //     R2 = Rotor { r_a, r_b01, r_b02, r_b12 };
+    //     Geo_Normalise(R2);
+    // }
+    // return R;
+    // Print("R1: ", R);
+    // Print("R2: ", R2);
+
     return R;
 }
 
@@ -342,13 +397,16 @@ struct Matrix4
     {
         return data[x];
     }
+    float
+    operator[](int x) const
+    {
+        return data[x];
+    }
 };
 
 
-struct Quat
-{
-    float data[4];
-};
+void
+Print(char const* text, Matrix4 const& m);
 
 
 inline Matrix4
@@ -378,7 +436,41 @@ ToMatrix4(Rotor const& R)
     mat[12] = 0;
     mat[13] = 0;
     mat[14] = 0;
-    mat[15] = 0;
+    mat[15] = 1;
+
+    // mat[0 + 0]  = v0[0];
+    // mat[4 + 0]  = v0[1];
+    // mat[8 + 0]  = v0[2];
+    // mat[12 + 0] = 0;
+
+    // mat[0 + 1]  = v1[0];
+    // mat[4 + 1]  = v1[1];
+    // mat[8 + 1]  = v1[2];
+    // mat[12 + 1] = 0;
+
+    // mat[0 + 2]  = v2[0];
+    // mat[4 + 2]  = v2[1];
+    // mat[8 + 2]  = v2[2];
+    // mat[12 + 2] = 0;
+
+    // mat[0 + 3]  = 0;
+    // mat[4 + 3]  = 0;
+    // mat[8 + 3]  = 0;
+    // mat[12 + 3] = 1;
 
     return mat;
+}
+
+
+inline Rotor
+RotorFromEuler(float yaw, float pitch, float roll)
+{
+    auto R_yaw = Rotor(cosf(-yaw / 2.0f), 0.0, sinf(-yaw / 2), 0.0);
+    auto R_pit = Rotor(cosf(-pitch / 2.0f), 0.0, 0.0, sinf(-pitch / 2));
+    auto R_rol = Rotor(cosf(-roll / 2.0f), sinf(-roll / 2), 0.0, 0.0);
+
+    auto R1 = Geo_Mul(R_yaw, R_pit);
+    auto R2 = Geo_Mul(R1, R_rol);
+
+    return R2;
 }

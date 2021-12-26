@@ -324,6 +324,90 @@ Test_Rotate3D()
 }
 
 
+void
+Test_RotationCompositionAndRotationMatrix()
+{
+    printf(__func__);
+    printf("\n");
+
+    {
+        auto angle = 00.0f;
+        auto rad   = angle * M_PI / 180.0;
+
+        auto R = RotorFromEuler(rad, rad, rad);
+        Print("R: ", R);
+
+        auto M = ToMatrix4(R);
+        Print("M: ", M);
+        printf("\n");
+    }
+    {
+        auto angle = 45.0f;
+        auto rad   = angle * M_PI / 180.0;
+        printf("Angles: %f %f %f\n", rad, 0.0, 0.0);
+
+        auto R = RotorFromEuler(rad, 0.0, 0.0);
+        Print("R: ", R);
+
+        auto M = ToMatrix4(R);
+        Print("M: ", M);
+        printf("\n");
+    }
+    {
+        auto angle = 45.0f;
+        auto rad   = angle * M_PI / 180.0;
+
+        printf("Angles: %f %f %f\n", 0.0, rad, 0.0);
+
+        auto R = RotorFromEuler(0.0, rad, 0.0);
+        Print("R: ", R);
+
+        auto M = ToMatrix4(R);
+        Print("M: ", M);
+        printf("\n");
+    }
+    {
+        auto angle = 45.0f;
+        auto rad   = angle * M_PI / 180.0;
+
+        printf("Angles: %f %f %f\n", 0.0, 0.0, rad);
+
+        auto R = RotorFromEuler(0.0, 0.0, rad);
+        Print("R: ", R);
+
+        auto M = ToMatrix4(R);
+        Print("M: ", M);
+        printf("\n");
+    }
+    {
+        auto angle = 45.0f;
+        auto rad   = angle * M_PI / 180.0;
+
+        printf("Angles: %f %f %f\n", rad, rad, 0.0);
+
+        auto R = RotorFromEuler(rad, rad, 0.0);
+        Print("R: ", R);
+
+        auto M = ToMatrix4(R);
+        Print("M: ", M);
+        printf("\n");
+    }
+    {
+        auto angle = 45.0f;
+        auto rad   = angle * M_PI / 180.0;
+
+        printf("Angles: %f %f %f\n", rad, rad, rad);
+
+        auto R = RotorFromEuler(rad, rad, rad);
+        Print("R: ", R);
+
+        auto M = ToMatrix4(R);
+        Print("M: ", M);
+        printf("\n");
+    }
+}
+
+
 int
 main(void)
 {
@@ -335,6 +419,7 @@ main(void)
     // Test_RotateByTheta();
     // Test_RotateByMultiVector();
     Test_Rotate3D();
+    Test_RotationCompositionAndRotationMatrix();
 
     printf("%s PASSED\n", "test_basic_operators.cpp");
 }

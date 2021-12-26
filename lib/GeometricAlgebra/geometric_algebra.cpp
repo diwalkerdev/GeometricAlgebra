@@ -22,6 +22,21 @@ Print(char const* text, TriVector const& T)
     printf("%s %0.3f<e123>\n", text, T.e123);
 }
 
+void
+Print(char const* text, Matrix4 const& m)
+{
+    printf("%s", text);
+    for (int i = 0; i < 4; ++i)
+    {
+        printf("\n    ");
+        for (int k = 0; k < 4; ++k)
+        {
+            printf("%.3f  ", m[4 * i + k]);
+        }
+    }
+    printf("\n");
+}
+
 
 Vec
 Vec_Zero()
