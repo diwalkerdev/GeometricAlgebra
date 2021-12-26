@@ -3,9 +3,38 @@
 
 
 void
-Vec_Print(Vec const& v1)
+Print(char const* text, Vec const& v1)
 {
-    printf("%0.3f<x> %0.3f<y> %0.3f<z>\n", v1.x, v1.y, v1.z);
+    printf("%s %0.3f<x> %0.3f<y> %0.3f<z>\n", text, v1.x, v1.y, v1.z);
+}
+
+
+void
+Print(char const* text, Rotor const& R)
+{
+    printf("%s %0.3f<r> %0.3f<e12> %0.3f<e13> %0.3f<e23>\n", text, R.s, R.B.e12, R.B.e13, R.B.e23);
+}
+
+
+void
+Print(char const* text, TriVector const& T)
+{
+    printf("%s %0.3f<e123>\n", text, T.e123);
+}
+
+void
+Print(char const* text, Matrix4 const& m)
+{
+    printf("%s", text);
+    for (int i = 0; i < 4; ++i)
+    {
+        printf("\n    ");
+        for (int k = 0; k < 4; ++k)
+        {
+            printf("%.3f  ", m[4 * i + k]);
+        }
+    }
+    printf("\n");
 }
 
 
@@ -16,10 +45,20 @@ Vec_Zero()
 }
 
 
-void
-Vec_Add_(Vec& v1, Vec const& v2)
+float
+Vec_Magnitude(Vec const& v1)
 {
-    v1.x += v2.x;
-    v1.y += v2.y;
-    v1.z += v2.z;
+    return sqrtf(v1.x * v1.x + v1.y * v1.y + v1.z * v1.z);
+}
+
+
+Vec
+Vec_Normalise(Vec const& u)
+{
+    auto m = Vec_Magnitude(u);
+    return {
+        u.x / m,
+        u.y / m,
+        u.z / m
+    };
 }
