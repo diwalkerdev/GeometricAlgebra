@@ -35,7 +35,7 @@ struct Vec
 
 
     Vec
-    operator+(Vec const& other)
+    operator+(Vec const& other) const
     {
         return {
             this->x + other.x,
@@ -56,7 +56,7 @@ struct Vec
 
 
     Vec
-    operator-(Vec const& other)
+    operator-(Vec const& other) const
     {
         return {
             this->x - other.x,
@@ -77,7 +77,7 @@ struct Vec
 
 
     Vec
-    operator*(float scalar)
+    operator*(float scalar) const
     {
         return {
             this->x * scalar,
@@ -473,4 +473,12 @@ RotorFromEuler(float yaw, float pitch, float roll)
     auto R2 = Geo_Mul(R1, R_rol);
 
     return R2;
+}
+
+
+inline float
+Vec_Distance(Vec const& a, Vec const& b)
+{
+    auto d = a - b;
+    return Vec_Magnitude(d);
 }
